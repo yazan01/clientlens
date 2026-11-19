@@ -2,6 +2,7 @@ const state = {
   clients: [],
   products: [],
   client: null,
+  sessionId: null,
   messages: [],
   feedback: "",
 };
@@ -89,20 +90,50 @@ function renderClients() {
     b.addEventListener("click", () => startInterview(b.dataset.client)));
 }
 
-function startInterview(clientId) {
-  state.client = state.clients.find((c) => c.id === clientId);
-  state.messages = [];
-  state.feedback = "";
+const SESSION_KEY = "clientlens.sessionId";
+
+function saveSessionId(id) {
+  try { id ? localStorage.setItem(SESSION_KEY, id) : localStorage.removeItem(SESSION_KEY); } catch (e) { }
+}
+
+function loadSessionId() {
+  try { return localStorage.getItem(SESSION_KEY); } catch (e) { return null; }
+}
+
+function showFeedback(text) {
+  state.feedback = text;
+  if (text) {
+    $("#feedback").classList.remove("muted");
+    $("#feedback").innerHTML = renderMarkdown(text);
+  } else {
+    $("#feedback").classList.add("muted");
+    $("#feedback").innerHTML = "Write your summary, select products and click <em>Get coach feedback</em>.";
+  }
+  $("#btn-download").disabled = !text;
+}
+
+function openSession(session) {
+  state.sessionId = session.session_id;
+  state.client = state.clients.find((c) => c.id === session.client_id);
+  state.messages = session.messages;
+  saveSessionId(session.session_id);
   $("#chat-client-name").textContent = state.client.name;
   $("#chat-client-headline").textContent = state.client.headline;
-  $("#summary").value = "";
-  $("#feedback").innerHTML = "Write your summary, select products and click <em>Get coach feedback</em>.";
-  $("#feedback").classList.add("muted");
-  $("#btn-download").disabled = true;
-  document.querySelectorAll("#product-checks input").forEach((i) => (i.checked = false));
+  $("#summary").value = session.summary || "";
+  const picked = new Set(session.recommended_product_ids || []);
+  document.querySelectorAll("#product-checks input").forEach((i) => (i.checked = picked.has(i.value)));
+  showFeedback(session.feedback || "");
   renderChat();
-  showStep("interview");
-  $("#chat-input").focus();
+}
+
+async function startInterview(clientId) {
+  try {
+    openSession(await api("/api/sessions", { client_id: clientId }));
+    showStep("interview");
+    $("#chat-input").focus();
+  } catch (e) {
+    alert(`Could not start the interview: ${e.message}`);
+  }
 }
 
 function bubble(role, text, extraClass = "") {
@@ -123,8 +154,9 @@ async function sendMessage(text) {
   renderChat(`<div class="msg client typing">${escapeHtml(state.client.name)} is typing...</div>`);
   $("#btn-send").disabled = true;
   try {
-    const { reply } = await api("/api/chat", { client_id: state.client.id, messages: state.messages });
+    const { reply } = await api(`/api/sessions/${state.sessionId}/messages`, { content: text });
     state.messages.push({ role: "assistant", content: reply });
+    showFeedback("");
     renderChat();
   } catch (e) {
     state.messages.pop();
@@ -161,16 +193,11 @@ async function getFeedback() {
   $("#feedback").classList.add("muted");
   $("#feedback").textContent = "The coach is reviewing your interview...";
   try {
-    const { feedback } = await api("/api/feedback", {
-      client_id: state.client.id,
-      messages: state.messages,
+    const { feedback } = await api(`/api/sessions/${state.sessionId}/feedback`, {
       summary: $("#summary").value,
       recommended_product_ids: selectedProductIds(),
     });
-    state.feedback = feedback;
-    $("#feedback").classList.remove("muted");
-    $("#feedback").innerHTML = renderMarkdown(feedback);
-    $("#btn-download").disabled = false;
+    showFeedback(feedback);
   } catch (e) {
     $("#feedback").innerHTML = `<span style="color:var(--error)">Error: ${escapeHtml(e.message)}</span>`;
   } finally {
@@ -224,7 +251,24 @@ $("#btn-end").addEventListener("click", () => {
 $("#btn-back").addEventListener("click", () => showStep("interview"));
 $("#btn-feedback").addEventListener("click", getFeedback);
 $("#btn-download").addEventListener("click", downloadSession);
-$("#btn-restart").addEventListener("click", () => showStep("select"));
+$("#btn-restart").addEventListener("click", () => {
+  saveSessionId(null);
+  state.sessionId = null;
+  showStep("select");
+});
+
+async function restoreSession() {
+  const id = loadSessionId();
+  if (!id) return;
+  try {
+    const session = await api(`/api/sessions/${id}`);
+    if (!state.clients.some((c) => c.id === session.client_id)) throw new Error("client removed");
+    openSession(session);
+    showStep(session.feedback ? "feedback" : "interview");
+  } catch (e) {
+    saveSessionId(null);
+  }
+}
 
 (async function init() {
   try {
@@ -235,5 +279,7 @@ $("#btn-restart").addEventListener("click", () => showStep("select"));
     renderProducts();
   } catch (e) {
     $("#client-list").innerHTML = `<p style="color:var(--error)">Failed to load data: ${escapeHtml(e.message)}</p>`;
+    return;
   }
+  await restoreSession();
 })();
