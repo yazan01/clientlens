@@ -18,8 +18,21 @@ function renderMarkdown(md) {
     .replace(/(^|[^*])\*(?!\s)(.+?)\*/g, "$1<em>$2</em>")
     .replace(/`(.+?)`/g, "<code>$1</code>");
   const lines = md.split(/\r?\n/);
-  let html = "", list = null, i = 0;
-  const closeList = () => { if (list) { html += `</${list}>`; list = null; } };
+  let html = "", i = 0;
+  const stack = [];
+  const closeList = () => { while (stack.length) html += `</li></${stack.pop().type}>`; };
+  const listItem = (type, indent, text) => {
+    while (stack.length && stack[stack.length - 1].indent > indent) html += `</li></${stack.pop().type}>`;
+    const top = stack[stack.length - 1];
+    if (top && top.indent === indent && top.type === type) {
+      html += "</li><li>";
+    } else {
+      if (top && top.indent === indent) html += `</li></${stack.pop().type}>`;
+      html += `<${type}><li>`;
+      stack.push({ type, indent });
+    }
+    html += inline(text);
+  };
   while (i < lines.length) {
     const line = lines[i];
     if (/^\s*\|.*\|\s*$/.test(line) && i + 1 < lines.length && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1])) {
@@ -36,9 +49,9 @@ function renderMarkdown(md) {
     }
     let m;
     if ((m = line.match(/^(#{1,4})\s+(.*)/))) { closeList(); html += `<h2>${inline(m[2])}</h2>`; }
-    else if ((m = line.match(/^\s*[-*]\s+(.*)/))) { if (list !== "ul") { closeList(); html += "<ul>"; list = "ul"; } html += `<li>${inline(m[1])}</li>`; }
-    else if ((m = line.match(/^\s*\d+[.)]\s+(.*)/))) { if (list !== "ol") { closeList(); html += "<ol>"; list = "ol"; } html += `<li>${inline(m[1])}</li>`; }
-    else if (line.trim() === "") { closeList(); }
+    else if ((m = line.match(/^(\s*)[-*]\s+(.*)/))) { listItem("ul", m[1].replace(/\t/g, "    ").length, m[2]); }
+    else if ((m = line.match(/^(\s*)\d+[.)]\s+(.*)/))) { listItem("ol", m[1].replace(/\t/g, "    ").length, m[2]); }
+    else if (line.trim() === "") { }
     else { closeList(); html += `<p>${inline(line)}</p>`; }
     i++;
   }

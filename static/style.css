@@ -99,7 +99,9 @@ textarea {
 #print-view { display: none; }
 
 @media print {
-  body { background: #fff; color: #000; font-size: 11pt; }
+  @page { margin: 0 14mm; }
+  body { background: #fff; color: #000; font-size: 11pt; margin: 0; }
+  #print-view { padding: 14mm 0; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
   .topbar, main { display: none !important; }
   #print-view { display: block; }
   #print-view h1 { font-size: 18pt; margin-bottom: 0; }
