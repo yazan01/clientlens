@@ -58,7 +58,7 @@ def chat(req: ChatRequest):
     convo = [{"role": "assistant", "content": client["opening_line"]}] + history
     system = prompts.client_system_prompt(client, content.load_products())
     try:
-        reply = ai.chat([{"role": "system", "content": system}] + convo, temperature=0.7, max_tokens=400)
+        reply = ai.chat([{"role": "system", "content": system}] + convo, temperature=0.5, max_tokens=1000)
     except ai.AIError as e:
         raise HTTPException(502, str(e))
     return {"reply": reply}
@@ -78,7 +78,7 @@ def feedback(req: FeedbackRequest):
         text = ai.chat(
             [{"role": "system", "content": prompts.coach_system_prompt()},
              {"role": "user", "content": user_msg}],
-            model=ai.AI_COACH_MODEL, temperature=0.3, max_tokens=1800,
+            model=ai.AI_COACH_MODEL, temperature=0.3, max_tokens=4000,
         )
     except ai.AIError as e:
         raise HTTPException(502, str(e))
