@@ -1,0 +1,133 @@
+[
+  {
+    "id": "business-current-account",
+    "name": "Pearl Business Current Account",
+    "category": "Business account",
+    "sharia_compliant": false,
+    "features": [
+      "Unlimited local transfers and cheque book",
+      "Online and mobile banking with multi-user access",
+      "Free payroll (WPS) processing for up to 50 employees"
+    ],
+    "limitations": [
+      "Conventional account - interest-based structure, not Sharia-compliant",
+      "Minimum average balance QAR 50,000, otherwise QAR 150 monthly fee"
+    ]
+  },
+  {
+    "id": "islamic-business-account",
+    "name": "Pearl Amanah Islamic Business Account",
+    "category": "Business account",
+    "sharia_compliant": true,
+    "features": [
+      "Sharia-compliant current account supervised by a Sharia board",
+      "Online and mobile banking with multi-user access",
+      "Free payroll (WPS) processing for up to 50 employees",
+      "Required account for any Pearl Islamic financing product"
+    ],
+    "limitations": [
+      "No interest or profit paid on balances",
+      "Minimum average balance QAR 50,000, otherwise QAR 150 monthly fee"
+    ]
+  },
+  {
+    "id": "conventional-overdraft",
+    "name": "Pearl Business Overdraft",
+    "category": "Business financing",
+    "sharia_compliant": false,
+    "features": [
+      "Revolving credit line up to QAR 1,000,000",
+      "Interest charged only on the amount used",
+      "Fast approval (about 5 working days) for existing customers"
+    ],
+    "limitations": [
+      "Conventional interest-based product - not Sharia-compliant",
+      "Variable interest rate (QIBOR + 3.5%)",
+      "Requires personal guarantee from the owner and 2 years of audited accounts",
+      "Reviewed yearly and can be reduced by the bank"
+    ]
+  },
+  {
+    "id": "murabaha-working-capital",
+    "name": "Pearl Murabaha Working Capital Finance",
+    "category": "Business financing (Islamic)",
+    "sharia_compliant": true,
+    "features": [
+      "Sharia-compliant financing: the bank buys goods and sells them to the client at a fixed agreed profit",
+      "Can be drawn against confirmed customer invoices (receivables) to bridge payment delays",
+      "Fixed profit rate known upfront, tenor 30 to 180 days per drawdown",
+      "Limit up to QAR 2,000,000"
+    ],
+    "limitations": [
+      "Each drawdown must be linked to a real purchase of goods - cannot be used as free cash",
+      "Requires the Pearl Amanah Islamic Business Account",
+      "Requires 2 years of audited accounts",
+      "Processing takes about 3 weeks"
+    ]
+  },
+  {
+    "id": "islamic-trade-finance",
+    "name": "Pearl Islamic Trade Finance (Letters of Credit)",
+    "category": "Trade finance (Islamic)",
+    "sharia_compliant": true,
+    "features": [
+      "Sharia-compliant import Letters of Credit and guarantees",
+      "Protects both buyer and foreign supplier when importing",
+      "Can be combined with Murabaha to finance the imported goods"
+    ],
+    "limitations": [
+      "Only for import/export transactions with documented shipments",
+      "Fees of 0.25% to 0.5% per transaction",
+      "Requires the Pearl Amanah Islamic Business Account"
+    ]
+  },
+  {
+    "id": "conventional-home-loan",
+    "name": "Pearl Home Loan",
+    "category": "Personal financing",
+    "sharia_compliant": false,
+    "features": [
+      "Finance up to 70% of the property value for expatriates",
+      "Tenor up to 25 years",
+      "Fixed rate for the first 3 years, then variable"
+    ],
+    "limitations": [
+      "Conventional interest-based product",
+      "Total monthly debt repayments must not exceed 50% of fixed salary",
+      "Only fixed salary counts - bonuses and commissions are excluded",
+      "Early settlement fee of 1% of the outstanding amount"
+    ]
+  },
+  {
+    "id": "ijara-home-finance",
+    "name": "Pearl Ijara Home Finance",
+    "category": "Personal financing (Islamic)",
+    "sharia_compliant": true,
+    "features": [
+      "Sharia-compliant lease-to-own home finance",
+      "Finance up to 70% of the property value for expatriates",
+      "Tenor up to 25 years"
+    ],
+    "limitations": [
+      "Total monthly debt repayments must not exceed 50% of fixed salary",
+      "Only fixed salary counts - bonuses and commissions are excluded",
+      "Slightly higher profit rate than the conventional home loan"
+    ]
+  },
+  {
+    "id": "debt-consolidation-loan",
+    "name": "Pearl Debt Consolidation Personal Loan",
+    "category": "Personal financing",
+    "sharia_compliant": false,
+    "features": [
+      "Combines credit card and other personal debts into one lower monthly payment",
+      "Rate much lower than typical credit card rates",
+      "Tenor up to 4 years, salary transfer required"
+    ],
+    "limitations": [
+      "Conventional interest-based product",
+      "Maximum amount QAR 200,000",
+      "Counts toward the 50% debt-burden limit for any future home loan"
+    ]
+  }
+]

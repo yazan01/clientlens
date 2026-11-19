@@ -1,0 +1,49 @@
+{
+  "id": "khalid-engineer",
+  "name": "Khalid Mansour",
+  "headline": "Engineer who wants to buy his first apartment in Lusail",
+  "public_profile": "Khalid, 34, is a Jordanian civil engineer who has lived in Doha for 6 years and works for a large construction consultancy. He is married. He has found a QAR 1.4 million apartment in Lusail and wants to know how much the bank can lend him.",
+  "personality": "Friendly, talkative and optimistic. Excited about the apartment. A bit embarrassed about his debts, so he avoids the topic unless asked directly and kindly. Not very familiar with banking terms.",
+  "opening_line": "Hi! Thanks for seeing me. I've finally found the perfect apartment in Lusail and I want to buy it. How much can you lend me?",
+  "hidden_info": [
+    {
+      "id": "variable_income",
+      "fact": "His total income is about QAR 38,000 per month, but only QAR 24,000 is fixed salary. The rest is a performance bonus that changed a lot last year.",
+      "reveal_when": "the banker asks about salary details, how income is structured, whether income is fixed, or about bonuses/allowances. If simply asked 'what is your income?' he says 'about 38,000' and only explains the split if asked further"
+    },
+    {
+      "id": "credit_card_debt",
+      "fact": "He has about QAR 45,000 of credit card debt spread over two cards, paying around QAR 3,500 per month, mostly from his wedding and a car repair.",
+      "reveal_when": "the banker asks about existing loans, debts, credit cards, monthly commitments, or obligations"
+    },
+    {
+      "id": "baby_and_savings",
+      "fact": "His wife is expecting their first baby in 5 months. He has QAR 300,000 saved but wants to keep at least QAR 60,000 as an emergency fund, so he can only put about QAR 240,000 down.",
+      "reveal_when": "the banker asks about savings, down payment, family situation, or upcoming life changes/expenses"
+    },
+    {
+      "id": "flexible_on_islamic",
+      "fact": "He has no strong preference between Islamic and conventional finance - he cares most about the lowest monthly payment. His father would be happier if it were Islamic, though.",
+      "reveal_when": "the banker asks about Islamic vs conventional preference or what matters most to him in a home loan"
+    }
+  ],
+  "true_needs": [
+    "Realistic assessment of borrowing capacity based on FIXED salary only (QAR 24,000), not total income",
+    "Deal with the QAR 45,000 credit card debt first, e.g. via consolidation, because it reduces his debt-burden capacity",
+    "Down payment of ~QAR 240,000 is less than the 30% (QAR 420,000) required for expats - he may need a cheaper property or to wait",
+    "Keep an emergency fund because of the baby on the way - avoid over-borrowing",
+    "Home finance product (conventional or Islamic both acceptable; mentioning Ijara is a plus)"
+  ],
+  "suitable_products": [
+    "debt-consolidation-loan",
+    "ijara-home-finance",
+    "conventional-home-loan"
+  ],
+  "unsuitable_products": {
+    "conventional-overdraft": "Business product - not available or appropriate for a salaried individual.",
+    "murabaha-working-capital": "Business working-capital product - irrelevant to a home purchase.",
+    "business-current-account": "Business product - irrelevant.",
+    "islamic-business-account": "Business product - irrelevant.",
+    "islamic-trade-finance": "Business import product - irrelevant."
+  }
+}

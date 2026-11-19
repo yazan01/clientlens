@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ClientLens</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">ClientLens <span>Bank Client Discovery Simulator</span></div>
+    <ol class="steps">
+      <li data-step="select" class="active">1. Select client</li>
+      <li data-step="interview">2. Interview</li>
+      <li data-step="feedback">3. Summary &amp; feedback</li>
+    </ol>  </header>
+
+  <main>
+    <section id="step-select" class="step">
+      <h1>Choose a client to interview</h1>
+      <p class="muted">You are a relationship manager at Pearl Bank. Ask good questions to uncover the client's real needs, then recommend suitable products. Some information is only revealed if you ask the right questions.</p>
+      <div id="client-list" class="cards"></div>
+    </section>
+
+    <section id="step-interview" class="step hidden">
+      <div class="interview-layout">
+        <div class="chat-panel">
+          <div class="chat-header">
+            <div>
+              <strong id="chat-client-name"></strong>
+              <div class="muted small" id="chat-client-headline"></div>
+            </div>
+            <button id="btn-end" class="btn secondary">End interview &rarr;</button>
+          </div>
+          <div id="chat-log" class="chat-log"></div>
+          <form id="chat-form" class="chat-form">
+            <textarea id="chat-input" rows="2" placeholder="Ask the client a question... (Enter to send, Shift+Enter for new line)" required></textarea>
+            <button class="btn" type="submit" id="btn-send">Send</button>
+          </form>
+        </div>
+        <aside class="catalogue">
+          <h2>Product catalogue</h2>
+          <div id="product-list"></div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="step-feedback" class="step hidden">
+      <div class="feedback-layout">
+        <div class="summary-panel">
+          <h1>Your summary</h1>
+          <label for="summary">Summarise the client's needs as you understood them:</label>
+          <textarea id="summary" rows="7" placeholder="e.g. The client needs ... because ..."></textarea>
+          <p><strong>Products you recommend:</strong></p>
+          <div id="product-checks" class="checks"></div>
+          <div class="row">
+            <button id="btn-back" class="btn secondary">&larr; Back to interview</button>
+            <button id="btn-feedback" class="btn">Get coach feedback</button>
+          </div>
+        </div>
+        <div class="coach-panel">
+          <h1>AI Coach feedback</h1>
+          <div id="feedback" class="feedback muted">Write your summary, select products and click <em>Get coach feedback</em>.</div>
+          <div class="row">
+            <button id="btn-download" class="btn secondary" disabled>Download PDF</button>
+            <button id="btn-restart" class="btn secondary">Start a new interview</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="print-view"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
