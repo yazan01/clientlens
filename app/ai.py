@@ -36,5 +36,8 @@ def chat(messages: list[dict], *, model: str | None = None, temperature: float =
         raise AIError(f"AI provider error: {e}") from e
 
     if not resp.choices or not resp.choices[0].message.content:
+        if resp.choices and resp.choices[0].finish_reason == "length":
+            raise AIError("The AI model used up its token limit before answering (reasoning models think first). "
+                          "Try again or raise max_tokens.")
         raise AIError("The AI model returned an empty response. Try again or switch AI_MODEL.")
     return resp.choices[0].message.content.strip()

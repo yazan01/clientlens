@@ -34,6 +34,7 @@ def create(client_id: str) -> dict:
         "summary": "",
         "recommended_product_ids": [],
         "feedback": "",
+        "fact_check": "",
     }
     with _lock:
         _cache[session["id"]] = session
@@ -59,12 +60,15 @@ def add_messages(session: dict, *messages: dict) -> None:
     with _lock:
         session["messages"].extend(messages)
         session["feedback"] = ""
+        session["fact_check"] = ""
         _save(session)
 
 
-def set_feedback(session: dict, summary: str, recommended_ids: list[str], feedback: str) -> None:
+def set_feedback(session: dict, summary: str, recommended_ids: list[str], feedback: str,
+                 fact_check: str = "") -> None:
     with _lock:
         session["summary"] = summary
         session["recommended_product_ids"] = recommended_ids
         session["feedback"] = feedback
+        session["fact_check"] = fact_check
         _save(session)

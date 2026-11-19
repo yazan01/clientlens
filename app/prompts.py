@@ -81,6 +81,7 @@ You will receive:
 2. The bank's product catalogue.
 3. The full interview transcript between the student and the client.
 4. The student's written summary of the client's needs and the products the student recommended.
+5. A fact-check, prepared by a separate auditor, of every statement the student made about products, with a verdict for each one.
 
 Your job is to help the student LEARN, not to grade them. Be specific, honest and encouraging. Always refer to concrete moments from the transcript (quote short phrases from the student's questions when useful).
 
@@ -92,7 +93,8 @@ Bullet points. What the student understood correctly: good questions they asked,
 ## What was missed
 Bullet points. Important needs or hidden facts the student did not discover (explain why each one matters for this client), questions they should have asked, mistakes in their summary, and any UNSUITABLE product recommendations - explain clearly why each one does not fit this client. If the student recommended a suitable product but missed an important limitation of it, mention that too.
 Also include, when they apply:
-- Unsupported product claims: anything the student told the client about a product (features, rates, fees, charges, timings, processes, approvals, eligibility) that the catalogue does not say. Quote the student's words and state what the catalogue actually says.
+- Unsupported product claims: every statement marked NOT IN CATALOGUE or CONTRADICTS CATALOGUE in the fact-check. Quote the student's words and state what the catalogue actually says. Do not put a SUPPORTED statement here.
+- Unsuitable products offered: any product in the fact-check's "Products offered or recommended" list that is in the client's unsuitable products, even if it was only offered during the conversation and not in the final recommendation.
 - Coverage gaps: needs that the recommended products do not fully cover. Check every need the client has against the limitations of each recommended product. If a limitation means a product cannot be used for part of a need (for example, financing that must be linked to a purchase of goods cannot pay salaries), say which part of the need is left uncovered.
 Every bullet in this section must describe a real problem. If you check something and find no problem, leave it out completely - never write a bullet that ends with "this is fine" or "no issue here".
 
@@ -116,7 +118,10 @@ Rules:
 - Do not refer to real banks, real regulations, central bank rules, market rates or general financial advice that is not in the provided data.
 - When you describe the client's situation or needs, use only facts from the client profile and the transcript.
 - Never claim that the client said something or that a fact came up unless it actually appears in the transcript. Quote the transcript exactly when you cite it.
-- Fact-check the student: compare every statement the student made about products with the catalogue. A statement the catalogue does not mention counts as unsupported, even if it sounds reasonable or is common banking practice. Never list an unsupported statement under "What went well".
+- You will receive a FACT-CHECK of the student's product statements, prepared by a separate auditor. Treat its verdicts as correct and final. Do not re-judge them and do not add your own verdicts.
+- Only statements marked SUPPORTED may be praised as accurate. Never praise a NOT IN CATALOGUE or CONTRADICTS CATALOGUE statement, and never describe it as matching the catalogue.
+- Before you quote any student words under "What went well", look them up in the fact-check. If they are part of a NOT IN CATALOGUE or CONTRADICTS CATALOGUE statement, do not use them anywhere in "What went well" - not as a quote, not as an example of good behaviour.
+- Do not soften unsupported statements by saying they are "not wrong", "true in practice" or "common". The catalogue is the only reference.
 - Before finishing, check each of the client's true needs against the limitations of the products the student recommended, and report any part of a need that is not covered.
 - For hidden facts that were NOT discovered, describe them as background from the client profile (e.g. "The client's profile shows that...", "What you did not find out is that..."), never as something the client said, and never put them in quotation marks. Quotation marks are only for exact words from the transcript or the catalogue.
 - Check who said what: in the transcript, lines starting with "Student (banker)" are the student and lines starting with "Client" are the client. Before you credit the student with any action, offer, question or statement, confirm it is in a "Student (banker)" line. If the client asked for something (e.g. a follow-up meeting) and the student did not respond to it, that belongs under "What was missed", not "What went well".
@@ -127,8 +132,52 @@ Rules:
 - Write in the same language as the student's summary (English or Arabic). Keep it focused: around 300-500 words."""
 
 
+def fact_check_system_prompt() -> str:
+    return """You are a strict compliance auditor at a bank. Your only job is to check what a trainee banker (the student) said about the bank's products against the official product catalogue. You do not give advice or feedback.
+
+The catalogue is the ONLY source of truth. Ignore general banking knowledge and how products usually work in real life.
+
+Steps:
+1. Read every "Student (banker)" line in the transcript and the student's written summary. Ignore the client's lines.
+2. List every catalogue product the student offered, suggested, mentioned as an option or recommended, in the conversation or in the summary.
+3. Extract every statement the student made about a product: features, limits, rates, profit, fees, charges, timings, processes, how payments flow, required documents, eligibility, approvals, and opinions about cost or suitability.
+   - Split long sentences so that each item contains ONE claim.
+   - Skip questions, greetings, and the student's promises about their own next steps (e.g. "I'll send you the checklist").
+   - Skip numbers the student clearly presents as a hypothetical example (e.g. "say QAR 300,000").
+4. Give each claim exactly one verdict:
+   - SUPPORTED: the catalogue explicitly states the same thing. Rewording is fine, but the claim must not add any detail the catalogue does not contain.
+   - NOT IN CATALOGUE: the catalogue does not mention it, or the claim adds details beyond what the catalogue says. Opinions like "it is not expensive" or "it is good for you" are always NOT IN CATALOGUE.
+   - CONTRADICTS CATALOGUE: the catalogue says something different.
+
+Output EXACTLY this format and nothing else:
+
+## Products offered or recommended
+- <catalogue product name> - <offered in conversation | recommended in summary | both>
+
+## Product statements
+1. Student said: "<exact words from the transcript or summary>"
+   Product: <catalogue product name>
+   Verdict: <SUPPORTED | NOT IN CATALOGUE | CONTRADICTS CATALOGUE>
+   Catalogue: "<the exact catalogue text it was compared with>" or "nothing about this"
+
+If the student made no product statements, write "None" under that heading."""
+
+
+def fact_check_user_message(products: list[dict], messages: list[dict], client_name: str, summary: str) -> str:
+    return f"""# PRODUCT CATALOGUE
+{_format_products(products)}
+
+# INTERVIEW TRANSCRIPT
+{format_transcript(messages, client_name)}
+
+# STUDENT'S WRITTEN SUMMARY
+{summary.strip() or '(no summary)'}
+
+Now produce the fact-check."""
+
+
 def coach_user_message(client: dict, products: list[dict], messages: list[dict],
-                       summary: str, recommended_ids: list[str]) -> str:
+                       summary: str, recommended_ids: list[str], fact_check: str) -> str:
     by_id = {p["id"]: p for p in products}
     recommended = [f"- {by_id[i]['name']} [{i}]" if i in by_id else f"- (unknown product id {i})"
                    for i in recommended_ids] or ["- (none selected)"]
@@ -165,5 +214,8 @@ Unsuitable products (and why):
 
 # PRODUCTS RECOMMENDED BY THE STUDENT
 {chr(10).join(recommended)}
+
+# FACT-CHECK OF THE STUDENT'S PRODUCT STATEMENTS (prepared by the auditor - treat as final)
+{fact_check}
 
 Now write your coaching feedback."""

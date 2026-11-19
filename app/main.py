@@ -122,17 +122,22 @@ def feedback(session_id: str, req: FeedbackRequest):
     _acquire(session_id)
     try:
         products = content.load_products()
-        user_msg = prompts.coach_user_message(client, products, _conversation(client, session["messages"]),
-                                              req.summary, req.recommended_product_ids)
+        convo = _conversation(client, session["messages"])
         try:
+            fact_check = ai.chat(
+                [{"role": "system", "content": prompts.fact_check_system_prompt()},
+                 {"role": "user", "content": prompts.fact_check_user_message(products, convo, client["name"], req.summary)}],
+                model=ai.AI_COACH_MODEL, temperature=0.1, max_tokens=12000,
+            )
             text = ai.chat(
                 [{"role": "system", "content": prompts.coach_system_prompt()},
-                 {"role": "user", "content": user_msg}],
-                model=ai.AI_COACH_MODEL, temperature=0.3, max_tokens=4000,
+                 {"role": "user", "content": prompts.coach_user_message(
+                     client, products, convo, req.summary, req.recommended_product_ids, fact_check)}],
+                model=ai.AI_COACH_MODEL, temperature=0.3, max_tokens=12000,
             )
         except ai.AIError as e:
             raise HTTPException(502, str(e))
-        sessions.set_feedback(session, req.summary, req.recommended_product_ids, text)
+        sessions.set_feedback(session, req.summary, req.recommended_product_ids, text, fact_check)
     finally:
         _release(session_id)
     return {"feedback": text}
